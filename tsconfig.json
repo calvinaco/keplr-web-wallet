@@ -18,9 +18,22 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": { 
+      "*": [
+        "*",
+        "src/*"
+      ],
+      "@apptypes.d": [
+        "src/apptypes.d/index"
+      ],
+      "@recoil/*": [
+        "src/recoil/*"
+      ]
+    }
   },
   "include": [
     "src"
-  ]
+  ],
 }
