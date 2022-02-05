@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { RecoilRoot } from 'recoil';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { SnackbarProvider } from 'notistack';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
@@ -8,7 +10,17 @@ import reportWebVitals from './reportWebVitals';
 ReactDOM.render(
   <React.StrictMode>
     <RecoilRoot>
-      <App />
+      <Router basename={process.env.PUBLIC_URL}>
+        <SnackbarProvider
+          maxSnack={3}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "right"
+          }}
+        >
+          <App />
+        </SnackbarProvider>
+      </Router>
     </RecoilRoot>
   </React.StrictMode>,
   document.getElementById('root')
