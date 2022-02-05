@@ -1,12 +1,12 @@
-import { atom, selector } from 'recoil';
-import { Chain } from '../../apptypes.d';
+import { ChainConfig } from '../../apptypes.d';
 import chainListSelector from '../chainList/selector';
+import { atom, selector } from 'recoil';
 
-const currentChainAtom = atom<Chain>({
+const currentChainAtom = atom<ChainConfig>({
   key: 'currentChain',
   default: selector({
     key: 'firstChainOnChainList',
-    get: ({ get }): Chain => {
+    get: ({ get }): ChainConfig => {
       const chainList = get(chainListSelector);
       return chainList[0];
     },

@@ -1,24 +1,22 @@
-import { atom, atomFamily } from 'recoil'
-import { Denom, TokenBalance } from '../../apptypes.d';
+import { Coin, Denom } from '../../apptypes.d';
+import { atom, atomFamily } from 'recoil';
 
 // _balancesAtomFamily and _balanceDenomListAtom are internal atoms to support a reset-all-able
 // balance atom family.
 
-const _balancesAtomFamily = atomFamily<TokenBalance, Denom>({
+const _balancesAtomFamily = atomFamily<Coin, Denom>({
   key: 'balances',
   default: (denom: Denom) => ({
     denom,
-    humanReadableDenom: denom,
     amount: '0',
-  })
+    humanReadableDenom: denom,
+    humanReadableAmount: '0',
+  }),
 });
 
 const _balanceDenomListAtom = atom<Denom[]>({
-  key: 'balanceDenoms',
+  key: 'balanceDenomLists',
   default: [],
 });
 
-export {
-  _balancesAtomFamily,
-  _balanceDenomListAtom,
-};
+export { _balancesAtomFamily, _balanceDenomListAtom };

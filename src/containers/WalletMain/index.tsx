@@ -2,7 +2,9 @@ import { Typography } from '@mui/material';
 import { styled } from '@mui/system';
 import React from 'react';
 import { useRecoilValue } from 'recoil';
+import BalanceList from '../../components/BalanceList';
 import WalletAddressLabel from '../../components/WalletAddressLabel';
+import { allBalanceOfSelector } from '../../recoil/balanceOf';
 import currentWalletAtom from '../../recoil/currentWallet';
 import ConnectKeplrButton from '../ConnectKeplrButton';
 
@@ -13,6 +15,7 @@ const Container = styled('div')({
 
 function WalletMain(props: WalletMainProps) {
   const currentWallet = useRecoilValue(currentWalletAtom);
+  const allBalanceOf = useRecoilValue(allBalanceOfSelector);
 
   if (currentWallet === null) {
     return <ConnectKeplrButton />;
@@ -22,6 +25,7 @@ function WalletMain(props: WalletMainProps) {
     <Container>
       <Typography fontSize="25px">{currentWallet.name}</Typography>
       <WalletAddressLabel address={currentWallet.address} copyable />
+      <BalanceList balances={allBalanceOf} onStartTransfer={() => {}} />
     </Container>
   );
 }

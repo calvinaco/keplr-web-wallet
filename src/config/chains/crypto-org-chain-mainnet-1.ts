@@ -1,6 +1,6 @@
-import { Chain, ChainNetwork, ChainSource } from '../../apptypes.d';
+import { ChainConfig, ChainNetwork, ChainSource } from '../../apptypes.d';
 
-const CryptoOrgChainMainnet_1: Chain = {
+const CryptoOrgChainMainnet_1: ChainConfig = {
   id: 'crypto-org-chain-mainnet-1',
   name: 'Crypto.org Chain',
   network: ChainNetwork.Mainnet,
@@ -8,6 +8,14 @@ const CryptoOrgChainMainnet_1: Chain = {
   rpcBaseURLs: {
     lcd: 'https://lcd-crypto-org.keplr.app',
   },
+  currencyList: [
+    {
+      coinMinimalDenom: 'basecro',
+      coinDenom: 'CRO',
+      coinDecimals: 18,
+      alwaysDisplay: true,
+    },
+  ],
 };
 
 export { CryptoOrgChainMainnet_1 };

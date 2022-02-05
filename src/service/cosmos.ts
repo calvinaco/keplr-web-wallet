@@ -1,35 +1,33 @@
+import { Coin } from '../apptypes.d';
 import axios from 'axios';
-import { TokenBalance } from '../apptypes.d';
 
-const getAccountTokenBalanceList = async (
-  lcdBaseURL: string,
-  address: string,
-): Promise<TokenBalance[]> => {
-  const tokenBalanceList: TokenBalance[] = [];
+const getAccountCoinList = async (lcdBaseURL: string, address: string): Promise<Coin[]> => {
+  const coinList: Coin[] = [];
   const limit = 20;
   let page = 0;
   while (true) {
-    const bankBalances = await getBankBalanceList(lcdBaseURL, address, limit, page * limit);
-    for (const bankBalance of bankBalances) {
+    const bankBalanceList = await getBankBalanceList(lcdBaseURL, address, limit, page * limit);
+    for (const bankBalance of bankBalanceList) {
       let humanReadableDenom = bankBalance.denom;
       if (bankBalance.denom.startsWith('ibc/')) {
         humanReadableDenom = await getIBCDenomTraces(lcdBaseURL, bankBalance.denom);
       }
-      const tokenBalance: TokenBalance = {
+      const coin: Coin = {
         denom: bankBalance.denom,
-        humanReadableDenom,
         amount: bankBalance.amount,
+        humanReadableDenom,
+        humanReadableAmount: bankBalance.amount,
       };
-      tokenBalanceList.push(tokenBalance);
+      coinList.push(coin);
     }
 
-    if (bankBalances.length < limit) {
+    if (bankBalanceList.length < limit) {
       break;
     }
     page += 1;
   }
 
-  return tokenBalanceList;
+  return coinList;
 };
 
 const getBankBalanceList = async (
@@ -46,7 +44,7 @@ const getBankBalanceList = async (
 
 const getIBCDenomTraces = async (lcdBaseURL: string, denom: string): Promise<string> => {
   const resp = await axios.get(`${lcdBaseURL}/ibc/apps/transfer/v1/denom_traces/${denom.slice(4)}`);
-  return `${resp.data.path}/${resp.data.base_denom}`;
+  return `${resp.data.denom_trace.path}/${resp.data.denom_trace.base_denom}`;
 };
 
 type BankBalance = {
@@ -54,4 +52,4 @@ type BankBalance = {
   denom: string;
 };
 
-export { getAccountTokenBalanceList };
+export { getAccountCoinList };

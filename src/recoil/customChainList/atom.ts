@@ -1,9 +1,9 @@
+import { ChainConfig } from '../../apptypes.d';
 import { atom } from 'recoil';
-import { Chain } from '../../apptypes.d';
 
-const customChainListAtom = atom<Chain[]>({
+const customChainListAtom = atom<ChainConfig[]>({
   key: 'customChainList',
   default: [],
-})
+});
 
 export default customChainListAtom;

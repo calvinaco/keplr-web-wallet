@@ -1,7 +1,7 @@
+import { ChainConfig, ChainNetwork, ChainSource } from '../../apptypes.d';
 import { ChainInfo } from '@keplr-wallet/types';
-import { Chain, ChainNetwork, ChainSource } from '../../apptypes.d';
 
-const CronosMainnet25_1: Chain = {
+const CronosMainnet25_1: ChainConfig = {
   id: 'cronosmainnet_25-1',
   name: 'Cronos',
   network: ChainNetwork.Mainnet,
@@ -9,6 +9,14 @@ const CronosMainnet25_1: Chain = {
   rpcBaseURLs: {
     lcd: 'https://rest-cronos.crypto.org',
   },
+  currencyList: [
+    {
+      coinMinimalDenom: 'basecro',
+      coinDenom: 'CRO',
+      coinDecimals: 8,
+      alwaysDisplay: true,
+    },
+  ],
 };
 
 const CronosMainnet25_1KeplrChainConfig: ChainInfo = {

@@ -1,16 +1,10 @@
 import React from 'react';
-import { Chain, ChainId } from '../../apptypes.d';
+import { ChainConfig, ChainId } from '../../apptypes.d';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { SelectInputProps } from '@mui/material/Select/SelectInput';
-
-export type ChainSelectorProps = {
-  currentChain: Chain,
-  chainList: Chain[],
-  onChange: (chain: Chain) => void;
-};
 
 function ChainSelector(props: ChainSelectorProps) {
   const handleSelectChange :SelectInputProps<ChainId>['onChange'] = (event) => {
@@ -33,5 +27,11 @@ function ChainSelector(props: ChainSelectorProps) {
     </FormControl>
   );
 }
+
+export type ChainSelectorProps = {
+  currentChain: ChainConfig,
+  chainList: ChainConfig[],
+  onChange: (chain: ChainConfig) => void;
+};
 
 export default ChainSelector;

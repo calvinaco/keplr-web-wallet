@@ -1,3 +1,5 @@
+import { Currency } from './coin';
+
 export type Chain = {
   id: ChainId;
   name: string;
@@ -6,6 +8,10 @@ export type Chain = {
   rpcBaseURLs: {
     lcd: string;
   };
+};
+
+export type ChainConfig = Chain & {
+  currencyList: Currency[];
 };
 
 export type ChainId = string;

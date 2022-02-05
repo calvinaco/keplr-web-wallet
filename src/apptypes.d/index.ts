@@ -1,6 +1,6 @@
-import { Chain, ChainId, ChainNetwork, ChainSource } from './chain.d';
-import { Amount, Denom, TokenBalance } from './token.d';
+import { Chain, ChainConfig, ChainId, ChainNetwork, ChainSource } from './chain.d';
+import { Coin, Currency, Denom } from './coin';
 import { Wallet, WalletType } from './wallet.d';
 
-export type { Amount, Chain, ChainId, Denom, TokenBalance, Wallet };
+export type { Chain, ChainConfig, ChainId, Denom, Coin, Currency, Wallet };
 export { ChainSource, ChainNetwork, WalletType };
