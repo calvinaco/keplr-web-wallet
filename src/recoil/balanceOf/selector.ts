@@ -17,6 +17,7 @@ const allBalanceOfSelector = selector<Coin[]>({
         ...balance,
       }));
 
+    // TODO: Move logic to SelectorFamily
     const currencyList = get(currencyListOfSelector(get(currentChainAtom).id));
     currencyList
       .filter((currency) => currency.alwaysDisplay)
@@ -36,7 +37,7 @@ const allBalanceOfSelector = selector<Coin[]>({
 
         balances[balanceIndex].humanReadableDenom = currency.coinDenom;
         balances[balanceIndex].humanReadableAmount = new BigNumber(balances[balanceIndex].amount)
-          .dividedBy(currency.coinDecimals)
+          .dividedBy(new BigNumber(10).pow(currency.coinDecimals))
           .toFormat(currency.coinDecimals);
       });
 

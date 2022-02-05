@@ -24,7 +24,7 @@ function BalanceList(props: BalanceListProps) {
             <ListItemAvatar>
               <BlockieAvatar value={coin.denom} />
             </ListItemAvatar>
-            <ListItemText primary={`${coin.amount} ${coin.humanReadableDenom}`} secondary={coin.denom} />
+            <ListItemText primary={`${coin.humanReadableAmount} ${coin.humanReadableDenom}`} secondary={`${coin.amount} ${coin.denom}`} />
           </ListItem>
         ))
       }

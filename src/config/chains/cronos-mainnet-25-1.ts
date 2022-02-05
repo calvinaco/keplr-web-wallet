@@ -13,7 +13,7 @@ const CronosMainnet25_1: ChainConfig = {
     {
       coinMinimalDenom: 'basecro',
       coinDenom: 'CRO',
-      coinDecimals: 8,
+      coinDecimals: 18,
       alwaysDisplay: true,
     },
   ],

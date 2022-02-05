@@ -12,7 +12,7 @@ const CryptoOrgChainMainnet_1: ChainConfig = {
     {
       coinMinimalDenom: 'basecro',
       coinDenom: 'CRO',
-      coinDecimals: 18,
+      coinDecimals: 8,
       alwaysDisplay: true,
     },
   ],
