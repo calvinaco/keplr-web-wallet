@@ -3,7 +3,6 @@ import currencyListOfSelector from '../currencyListOf';
 import currentChainAtom from '../currentChain';
 import { _balanceDenomListAtom } from './atom';
 import balanceOfSelectorFamily from './selectorFamily';
-import BigNumber from 'bignumber.js';
 import { DefaultValue, selector } from 'recoil';
 
 // A special selector that helps get and reset all balanceOf selector family members with

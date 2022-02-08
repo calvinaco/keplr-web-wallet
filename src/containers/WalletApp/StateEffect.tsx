@@ -22,12 +22,6 @@ function WalletAppStateEffect() {
   const resetAllBalanceOf = useResetRecoilState(allBalanceOfSelector);
   const [currentChain, setCurrentChain] = useRecoilState(currentChainAtom);
 
-  useEffect(() => {
-    window.addEventListener('keplr_keystorechange', (event) => {
-      connectKeplr();
-    });
-  }, []);
-
   const prevChain = useRef(currentChain);
   useEffect(() => {
     (async () => {
@@ -126,12 +120,6 @@ function WalletAppStateEffect() {
     ],
   );
 
-  useEffect(() => {
-    if (isPendingToConnectKeplr) {
-      connectKeplr();
-    }
-  }, [isPendingToConnectKeplr, connectKeplr]);
-
   const updateWalletBalances = useRecoilCallback(
     ({ set }) =>
       () =>
@@ -156,6 +144,18 @@ function WalletAppStateEffect() {
         })(),
     [currentChain, currentWallet, enqueueSnackbar],
   );
+
+  useEffect(() => {
+    if (isPendingToConnectKeplr) {
+      connectKeplr();
+    }
+  }, [isPendingToConnectKeplr, connectKeplr]);
+
+  useEffect(() => {
+    window.addEventListener('keplr_keystorechange', (event) => {
+      connectKeplr();
+    });
+  }, [connectKeplr]);
 
   let prevWalletAddress = useRef(currentWallet?.address);
   useEffect(() => {

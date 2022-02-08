@@ -294,6 +294,7 @@ function Transfer(props: TransferProps) {
       isIBCTransfer,
       ibcChannel,
       ibcTimeout,
+      notifyDeliveryTxResult,
     ],
   );
 
