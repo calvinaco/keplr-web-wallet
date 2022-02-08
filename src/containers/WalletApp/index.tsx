@@ -1,9 +1,9 @@
+import WalletMain from '../WalletMain';
+import Layout from './Layout';
+import WalletAppStateEffect from './StateEffect';
 import { styled } from '@mui/system';
 import React from 'react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import WalletAppStateEffect from './StateEffect';
-import WalletMain from '../WalletMain';
-import Layout from './Layout';
 
 const Container = styled('div')({
   borderRadius: 4,

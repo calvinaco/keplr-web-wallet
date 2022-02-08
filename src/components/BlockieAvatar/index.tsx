@@ -2,9 +2,9 @@ import Avatar, { AvatarProps } from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import makeBlockie from 'ethereum-blockies-base64';
 
-export type BlockieAvatarProps = {
+export type BlockieAvatarProps = AvatarProps & {
   value: string;
-} & AvatarProps;
+};
 
 function BlockieAvatar(props: BlockieAvatarProps) {
   if (props.value === '') {

@@ -22,23 +22,14 @@ const allBalanceOfSelector = selector<Coin[]>({
     currencyList
       .filter((currency) => currency.alwaysDisplay)
       .forEach((currency) => {
-        const balanceIndex = balances.findIndex(
-          (balance) => balance.denom === currency.coinMinimalDenom,
-        );
-        if (balanceIndex === -1) {
+        if (!balances.find((balance) => balance.denom === currency.coinMinimalDenom)) {
           balances.push({
             denom: currency.coinDenom,
             amount: '0',
             humanReadableDenom: currency.coinMinimalDenom,
             humanReadableAmount: '0',
           });
-          return;
         }
-
-        balances[balanceIndex].humanReadableDenom = currency.coinDenom;
-        balances[balanceIndex].humanReadableAmount = new BigNumber(balances[balanceIndex].amount)
-          .dividedBy(new BigNumber(10).pow(currency.coinDecimals))
-          .toFormat(currency.coinDecimals);
       });
 
     return balances.sort((a, b) => {

@@ -1,5 +1,8 @@
 import { Coin, Denom } from '../../apptypes.d';
+import currencyListOfSelectorFamily from '../currencyListOf';
+import currentChainAtom from '../currentChain';
 import { _balanceDenomListAtom, _balancesAtomFamily } from './atom';
+import BigNumber from 'bignumber.js';
 import { DefaultValue, selectorFamily } from 'recoil';
 
 const balanceOfSelectorFamily = selectorFamily<Coin, Denom>({
@@ -8,7 +11,20 @@ const balanceOfSelectorFamily = selectorFamily<Coin, Denom>({
     (denom: Denom) =>
     ({ get }) => {
       const balance = get(_balancesAtomFamily(denom));
-      return balance;
+      const currency = get(currencyListOfSelectorFamily(get(currentChainAtom).id)).find(
+        (currency) => currency.coinMinimalDenom === denom,
+      );
+      if (!currency) {
+        return balance;
+      }
+
+      return {
+        ...balance,
+        humanReadableDenom: currency.coinDenom,
+        humanReadableAmount: new BigNumber(balance.amount)
+          .dividedBy(new BigNumber(10).pow(currency.coinDecimals))
+          .toFormat(currency.coinDecimals),
+      };
     },
   set:
     (denom: Denom) =>

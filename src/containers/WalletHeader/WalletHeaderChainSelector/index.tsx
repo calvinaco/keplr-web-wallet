@@ -1,9 +1,9 @@
-import React, { useCallback } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
 import { ChainConfig } from '../../../apptypes.d';
-import ChainSelector from '../../../components/ChainSelector';
+import ChainSelect from '../../../components/ChainSelect';
 import chainListSelector from '../../../recoil/chainList/selector';
 import currentChainAtom from '../../../recoil/currentChain';
+import React, { useCallback } from 'react';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
 function WalletHeaderChainSelector() {
   const [currentChain, setCurrentChain] = useRecoilState(currentChainAtom);
@@ -14,8 +14,8 @@ function WalletHeaderChainSelector() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <ChainSelector
-      currentChain={currentChain}
+    <ChainSelect
+      value={currentChain.id}
       chainList={chainList}
       onChange={handleChainSelectorChange}
     />
