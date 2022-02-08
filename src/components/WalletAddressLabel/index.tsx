@@ -1,10 +1,10 @@
+import BlockieAvatar from '../BlockieAvatar';
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import copy from 'copy-to-clipboard';
 import React, { MouseEventHandler } from 'react';
-import BlockieAvatar from '../BlockieAvatar';
 
 function WalletAddressLabel(props: WalletAddressLabelProps) {
   const addressEllipsis = props.address.slice(0, 10) + '...' + props.address.slice(-8);
@@ -15,7 +15,7 @@ function WalletAddressLabel(props: WalletAddressLabelProps) {
       return;
     }
 
-    copy(addressEllipsis);
+    copy(props.address);
     setValue('Copied!');
     setTimeout(() => {
       setValue(addressEllipsis);
