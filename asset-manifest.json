@@ -1,22 +1,15 @@
 {
   "files": {
-    "main.css": "/keplr-web-wallet/static/css/main.f09a1402.chunk.css",
-    "main.js": "/keplr-web-wallet/static/js/main.f4d12a43.chunk.js",
-    "main.js.map": "/keplr-web-wallet/static/js/main.f4d12a43.chunk.js.map",
-    "runtime-main.js": "/keplr-web-wallet/static/js/runtime-main.7887b367.js",
-    "runtime-main.js.map": "/keplr-web-wallet/static/js/runtime-main.7887b367.js.map",
-    "static/js/2.34866f97.chunk.js": "/keplr-web-wallet/static/js/2.34866f97.chunk.js",
-    "static/js/2.34866f97.chunk.js.map": "/keplr-web-wallet/static/js/2.34866f97.chunk.js.map",
-    "static/js/3.42579ace.chunk.js": "/keplr-web-wallet/static/js/3.42579ace.chunk.js",
-    "static/js/3.42579ace.chunk.js.map": "/keplr-web-wallet/static/js/3.42579ace.chunk.js.map",
+    "main.css": "/keplr-web-wallet/static/css/main.1ef3a49a.css",
+    "main.js": "/keplr-web-wallet/static/js/main.c36aec13.js",
+    "static/js/787.2e174f85.chunk.js": "/keplr-web-wallet/static/js/787.2e174f85.chunk.js",
     "index.html": "/keplr-web-wallet/index.html",
-    "static/css/main.f09a1402.chunk.css.map": "/keplr-web-wallet/static/css/main.f09a1402.chunk.css.map",
-    "static/js/2.34866f97.chunk.js.LICENSE.txt": "/keplr-web-wallet/static/js/2.34866f97.chunk.js.LICENSE.txt"
+    "main.1ef3a49a.css.map": "/keplr-web-wallet/static/css/main.1ef3a49a.css.map",
+    "main.c36aec13.js.map": "/keplr-web-wallet/static/js/main.c36aec13.js.map",
+    "787.2e174f85.chunk.js.map": "/keplr-web-wallet/static/js/787.2e174f85.chunk.js.map"
   },
   "entrypoints": [
-    "static/js/runtime-main.7887b367.js",
-    "static/js/2.34866f97.chunk.js",
-    "static/css/main.f09a1402.chunk.css",
-    "static/js/main.f4d12a43.chunk.js"
+    "static/css/main.1ef3a49a.css",
+    "static/js/main.c36aec13.js"
   ]
 }
