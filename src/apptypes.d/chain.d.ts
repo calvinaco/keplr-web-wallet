@@ -1,20 +1,20 @@
 import { Currency } from './coin';
 
 export type Chain = {
-  id: ChainId;
+  id: string;
   name: string;
   network?: ChainNetwork;
   source: ChainSource;
   rpcBaseURLs: {
+    tendermint: string;
     lcd: string;
   };
-};
-
-export type ChainConfig = Chain & {
+  explorerURLs: {
+    account: string;
+    transaction: string;
+  };
   currencyList: Currency[];
 };
-
-export type ChainId = string;
 
 export enum ChainSource {
   KeplrDefault = 'keplrDefault',

@@ -1,6 +1,3 @@
-import { useSnackbar } from 'notistack';
-import React, { useCallback, useEffect, useRef } from 'react';
-import { useRecoilCallback, useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil';
 import { ChainSource, WalletType } from '../../apptypes.d';
 import { keplrConfigs } from '../../config';
 import { errorMessageGuard } from '../../error';
@@ -10,6 +7,9 @@ import currentWalletAtom from '../../recoil/currentWallet';
 import isPendingToConnectKeplrAtom from '../../recoil/isPendingToConnectKeplr';
 import { getAccountCoinList } from '../../service/cosmos';
 import { addChainToKeplr } from '../../service/keplr';
+import { useSnackbar } from 'notistack';
+import { useCallback, useEffect, useRef } from 'react';
+import { useRecoilCallback, useRecoilState, useResetRecoilState } from 'recoil';
 
 function WalletAppStateEffect() {
   const { enqueueSnackbar } = useSnackbar();
@@ -19,7 +19,6 @@ function WalletAppStateEffect() {
   );
   const [currentWallet, setCurrentWallet] = useRecoilState(currentWalletAtom);
   const resetCurrentWallet = useResetRecoilState(currentWalletAtom);
-  const allBalanceOf = useRecoilValue(allBalanceOfSelector);
   const resetAllBalanceOf = useResetRecoilState(allBalanceOfSelector);
   const [currentChain, setCurrentChain] = useRecoilState(currentChainAtom);
 
@@ -39,9 +38,12 @@ function WalletAppStateEffect() {
           setCurrentChain(prevChain.current);
 
           const message = errorMessageGuard(err);
-          enqueueSnackbar(`Error suggesting custom chain ${currentChain.name} to Keplr: ${message}`, {
-            variant: 'error',
-          });
+          enqueueSnackbar(
+            `Error suggesting custom chain ${currentChain.name} to Keplr: ${message}`,
+            {
+              variant: 'error',
+            },
+          );
           return;
         }
       }
@@ -49,21 +51,28 @@ function WalletAppStateEffect() {
 
       setIsPendingToConnectKeplr(true);
     })();
-  }, [currentChain]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [enqueueSnackbar, setCurrentChain, setIsPendingToConnectKeplr, currentChain]);
 
-  useEffect(() => {
-    if (isPendingToConnectKeplr) {
-      connectKeplr();
-    }
-  }, [isPendingToConnectKeplr]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  let prevWalletAddress = useRef(currentWallet?.address);
-  useEffect(() => {
-    if (prevWalletAddress.current !== currentWallet?.address) {
-      prevWalletAddress.current = currentWallet?.address;
-      updateWalletBalances();
-    }
-  }, [currentWallet]); // eslint-disable-line react-hooks/exhaustive-deps
+  const updateCurrentWallet = useCallback(
+    () =>
+      (async () => {
+        try {
+          const key = await window.keplr!.getKey(currentChain.id);
+          setCurrentWallet({
+            name: key.name,
+            type: key.isNanoLedger ? WalletType.Ledger : WalletType.Local,
+            address: key.bech32Address,
+          });
+        } catch (err) {
+          const message = errorMessageGuard(err);
+          enqueueSnackbar(`Error requesting Keplr key: ${message}`, {
+            variant: 'error',
+          });
+          return;
+        }
+      })(),
+    [currentChain, enqueueSnackbar, setCurrentWallet],
+  );
 
   const isConnectingKeplr = useRef(false);
   const connectKeplr = useCallback(
@@ -106,29 +115,22 @@ function WalletAppStateEffect() {
         isConnectingKeplr.current = false;
         setIsPendingToConnectKeplr(false);
       }),
-    [currentChain], // eslint-disable-line react-hooks/exhaustive-deps
+    [
+      currentChain,
+      enqueueSnackbar,
+      setIsPendingToConnectKeplr,
+      resetCurrentWallet,
+      resetAllBalanceOf,
+      updateCurrentWallet,
+      setCurrentWallet,
+    ],
   );
 
-  const updateCurrentWallet = useCallback(
-    () =>
-      (async () => {
-        try {
-          const key = await window.keplr!.getKey(currentChain.id);
-          setCurrentWallet({
-            name: key.name,
-            type: key.isNanoLedger ? WalletType.Ledger : WalletType.Local,
-            address: key.bech32Address,
-          });
-        } catch (err) {
-          const message = errorMessageGuard(err);
-          enqueueSnackbar(`Error requesting Keplr key: ${message}`, {
-            variant: 'error',
-          });
-          return;
-        }
-      })(),
-    [currentChain], // eslint-disable-line react-hooks/exhaustive-deps
-  );
+  useEffect(() => {
+    if (isPendingToConnectKeplr) {
+      connectKeplr();
+    }
+  }, [isPendingToConnectKeplr, connectKeplr]);
 
   const updateWalletBalances = useRecoilCallback(
     ({ set }) =>
@@ -152,8 +154,16 @@ function WalletAppStateEffect() {
             });
           }
         })(),
-    [currentChain, currentWallet], // eslint-disable-line react-hooks/exhaustive-deps
+    [currentChain, currentWallet, enqueueSnackbar],
   );
+
+  let prevWalletAddress = useRef(currentWallet?.address);
+  useEffect(() => {
+    if (prevWalletAddress.current !== currentWallet?.address) {
+      prevWalletAddress.current = currentWallet?.address;
+      updateWalletBalances();
+    }
+  }, [currentWallet, updateWalletBalances]);
 
   return null;
 }

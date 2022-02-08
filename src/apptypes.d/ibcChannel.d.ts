@@ -1,7 +1,9 @@
-export type IBCChannel = {
-  sourceChainId: string;
+export type IBCChannelConfig = {
+  [sourceChainId: string]: IBCSourceChainChannel[];
+};
+
+export type IBCSourceChainChannel = {
   destinationChainId: string;
-  sourceChannelId: string;
-  destinationChannelId: string;
+  channelId: string;
   label?: string;
 };

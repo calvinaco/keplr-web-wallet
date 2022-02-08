@@ -1,11 +1,11 @@
-import { ChainConfig } from '../../apptypes.d';
+import { RecoilValueReadOnly, selector } from 'recoil';
+import { Chain } from '../../apptypes.d';
 import { defaultChainList } from '../../config';
 import customChainListAtom from '../customChainList/atom';
-import { RecoilValueReadOnly, selector } from 'recoil';
 
-const chainListSelector: RecoilValueReadOnly<ChainConfig[]> = selector({
+const chainListSelector: RecoilValueReadOnly<Chain[]> = selector({
   key: 'chainList',
-  get: ({ get }): ChainConfig[] => {
+  get: ({ get }): Chain[] => {
     const customChainList = get(customChainListAtom);
     return [...defaultChainList, ...customChainList];
   },

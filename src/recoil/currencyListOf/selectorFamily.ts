@@ -1,12 +1,12 @@
-import { ChainId, Currency } from '../../apptypes.d';
+import { selectorFamily } from 'recoil';
+import { Currency } from '../../apptypes.d';
 import chainListAtom from '../chainList';
 import customCurrencyListOfAtomFamily from '../customCurrencyListOf';
-import { selectorFamily } from 'recoil';
 
-const currencyListOfSelectorFamily = selectorFamily<Currency[], ChainId>({
+const currencyListOfSelectorFamily = selectorFamily<Currency[], string>({
   key: 'currencyListOf',
   get:
-    (chainId: ChainId) =>
+    (chainId: string) =>
     ({ get }) => {
       const chain = get(chainListAtom).find((chain) => chain.id === chainId);
       if (!chain) {

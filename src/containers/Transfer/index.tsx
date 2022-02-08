@@ -1,21 +1,29 @@
-import { ChainConfig } from '../../apptypes.d';
+import { Chain, Currency, IBCSourceChainChannel, Wallet, WalletType } from '../../apptypes.d';
 import ChainSelect from '../../components/ChainSelect';
-import balanceOfSelectorFamily from '../../recoil/balanceOf';
+import CurrencySelect from '../../components/CurrencySelect';
+import IBCChannelSelect from '../../components/IBCChannelSelect';
+import balanceOfSelectorFamily, { allBalanceOfSelector } from '../../recoil/balanceOf';
 import chainListSelector from '../../recoil/chainList/selector';
 import currencyListOfSelectorFamily from '../../recoil/currencyListOf';
 import currentChainAtom from '../../recoil/currentChain';
 import currentWalletAtom from '../../recoil/currentWallet';
+import ibcChannelListOfSelectorFamily from '../../recoil/ibcChannelListOf';
+import { DeliverTxResponse, SigningStargateClient } from '@cosmjs/stargate';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import FormControl, { FormControlProps } from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
+import Slider from '@mui/material/Slider';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import BigNumber from 'bignumber.js';
-import React, { InputHTMLAttributes, useCallback, useState } from 'react';
-import { ChangeEventHandler } from 'react';
-import { ChangeEvent } from 'react';
-import NumberFormat, { NumberFormatProps } from 'react-number-format';
+import Long from 'long';
+import { DateTime, DurationLike } from 'luxon';
+import { useSnackbar } from 'notistack';
+import React, { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import NumberFormat from 'react-number-format';
 import { useRecoilValue } from 'recoil';
 
 function TransferFormControl(props: Omit<FormControlProps, 'margin' | 'fullWidth'>) {
@@ -51,20 +59,76 @@ interface NumberFormatCustomProps {
   name: string;
 }
 
-type TransferProps = {
-  denom: string;
-};
+type TransferProps = {};
+
+const ibcTimeoutDurationMarkList: {
+  value: number;
+  duration: DurationLike;
+  label: string;
+}[] = [
+  {
+    value: 0,
+    duration: { minutes: 5 },
+    label: '5 mins',
+  },
+  {
+    value: 1,
+    duration: { minutes: 15 },
+    label: '15 mins',
+  },
+  {
+    value: 2,
+    duration: { hour: 1 },
+    label: '1 hour',
+  },
+  {
+    value: 3,
+    duration: { hours: 2 },
+    label: '6 hours',
+  },
+  {
+    value: 4,
+    duration: { day: 1 },
+    label: '1 day',
+  },
+];
+
+function ibcTimeoutDurationValueText(value: number) {
+  return ibcTimeoutDurationMarkList.find((mark) => mark.value === value)?.label || 'test';
+}
 
 function Transfer(props: TransferProps) {
+  const { enqueueSnackbar } = useSnackbar();
   const currentChain = useRecoilValue(currentChainAtom);
   const chainList = useRecoilValue(chainListSelector);
-  const currentWallet = useRecoilValue(currentWalletAtom);
+  const currentWallet = useRecoilValue(currentWalletAtom) as Wallet;
   const currencyList = useRecoilValue(currencyListOfSelectorFamily(currentChain.id));
-  const balance = useRecoilValue(balanceOfSelectorFamily(props.denom));
-  const currency = currencyList.find((currency) => currency.coinMinimalDenom === props.denom);
-  if (!currency) {
-    throw new Error('Currency not found');
-  }
+  const allBalanceOf = useRecoilValue(allBalanceOfSelector);
+  const tokenList: Currency[] = useMemo(
+    () =>
+      allBalanceOf.map((balance) => {
+        const currencyDef = currencyList.find(
+          (currency) => currency.coinMinimalDenom === balance.denom,
+        );
+        if (currencyDef) {
+          return currencyDef;
+        }
+        return {
+          coinMinimalDenom: balance.denom,
+          coinDenom: balance.humanReadableDenom,
+          coinDecimals: 0,
+          alwaysDisplay: false,
+        };
+      }),
+    [allBalanceOf, currencyList],
+  );
+  const [token, setToken] = useState<Currency>(tokenList[0]);
+  const handleTokenChange = useCallback((currency: Currency) => {
+    setAmount('0');
+    setToken(currency);
+  }, []);
+
+  const balance = useRecoilValue(balanceOfSelectorFamily(token.coinMinimalDenom));
   const [amount, setAmount] = useState<string>('0');
   const handleAmountChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -76,74 +140,277 @@ function Transfer(props: TransferProps) {
     },
     [balance],
   );
+  const minimalCoinAmount = useMemo(
+    () => new BigNumber(amount).multipliedBy(new BigNumber(10).pow(token.coinDecimals)),
+    [token, amount],
+  );
 
   const [toAddress, setToAddress] = useState<string>('');
   const handleToAddressChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     setToAddress(event.target.value);
   }, []);
-  const [toChain, setToChain] = useState<ChainConfig>(currentChain);
-  const handleToChainChange = useCallback((chain: ChainConfig) => {
+  const [toChain, setToChain] = useState<Chain>(currentChain);
+  const handleToChainChange = useCallback((chain: Chain) => {
     setToChain(chain);
   }, []);
 
+  const isIBCTransfer = useMemo(() => currentChain.id !== toChain.id, [currentChain, toChain]);
+
+  const ibcChannels = useRecoilValue(
+    ibcChannelListOfSelectorFamily({
+      sourceChainId: currentChain.id,
+      destinationChainId: toChain.id,
+    }),
+  );
+  const [ibcChannel, setIBCChannel] = useState<IBCSourceChainChannel | null>(
+    ibcChannels.length > 0 ? ibcChannels[0] : null,
+  );
+  useEffect(() => {
+    setIBCChannel(ibcChannels.length > 0 ? ibcChannels[0] : null);
+  }, [ibcChannels]);
+  const handleIBCChannelChange = useCallback((channel: IBCSourceChainChannel) => {
+    console.log(channel);
+    setIBCChannel(channel);
+  }, []);
+  const [ibcTimeoutMark, setIBCTimeoutMark] = useState<number>(1);
+  const handleIBCTimeoutChange = useCallback(
+    (event: Event, value: number | number[], activeThumb: number) => {
+      setIBCTimeoutMark(value as number);
+    },
+    [],
+  );
+  const ibcTimeout = useMemo(() => {
+    return ibcTimeoutDurationMarkList[ibcTimeoutMark].duration;
+  }, [ibcTimeoutMark]);
+
+  const [isSending, setIsSending] = useState<boolean>(false);
+  const notifyDeliveryTxResult = useCallback(
+    (result: DeliverTxResponse) => {
+      if (result.code === 0) {
+        enqueueSnackbar(
+          <Typography>
+            Transaction (
+            <a
+              target="_blank"
+              href={currentChain.explorerURLs.transaction.replaceAll(
+                '{transaction}',
+                result.transactionHash,
+              )}
+              rel="noreferrer">
+              {result.transactionHash}
+            </a>
+            ) broadcasted successfully
+          </Typography>,
+          {
+            variant: 'success',
+          },
+        );
+      } else {
+        enqueueSnackbar(
+          <Typography>
+            Transaction (
+            <a
+              target="_blank"
+              href={currentChain.explorerURLs.transaction.replaceAll(
+                '{transaction}',
+                result.transactionHash,
+              )}
+              rel="noreferrer">
+              {result.transactionHash}
+            </a>
+            ) failed on chain
+          </Typography>,
+          {
+            variant: 'error',
+          },
+        );
+      }
+    },
+    [enqueueSnackbar, currentChain],
+  );
+  const sendOnKeplr = useCallback(
+    () =>
+      (async () => {
+        setIsSending(true);
+        const offlineSigner =
+          currentWallet.type === WalletType.Ledger
+            ? window.getOfflineSignerOnlyAmino!(currentChain.id)
+            : window.getOfflineSigner!(currentChain.id);
+        const cosmJS = await SigningStargateClient.connectWithSigner(
+          currentChain.rpcBaseURLs.tendermint,
+          offlineSigner,
+        );
+
+        // TODO: form validation
+        if (isIBCTransfer) {
+          const result = await cosmJS.sendIbcTokens(
+            currentWallet.address,
+            toAddress,
+            {
+              denom: token.coinMinimalDenom,
+              amount: minimalCoinAmount.toString(10),
+            },
+            'transfer',
+            ibcChannel!.channelId,
+            {
+              revisionNumber: Long.fromNumber(0),
+              revisionHeight: Long.fromNumber(0),
+            },
+            DateTime.now().setZone('utc').plus(ibcTimeout).toMillis() * 1000000,
+            {
+              amount: [],
+              gas: '200000',
+            },
+            '',
+          );
+          notifyDeliveryTxResult(result);
+        } else {
+          const result = await cosmJS.sendTokens(
+            currentWallet.address,
+            toAddress,
+            [
+              {
+                denom: token.coinMinimalDenom,
+                amount: minimalCoinAmount.toString(10),
+              },
+            ],
+            {
+              amount: [],
+              gas: '200000',
+            },
+            '',
+          );
+          notifyDeliveryTxResult(result);
+        }
+      })().finally(() => {
+        setIsSending(false);
+      }),
+    [
+      currentChain,
+      currentWallet,
+      minimalCoinAmount,
+      toAddress,
+      token,
+      isIBCTransfer,
+      ibcChannel,
+      ibcTimeout,
+    ],
+  );
+
   return (
-    <Box display="flex" justifyContent="center" alignItems="center">
-      <Box sx={{ width: '600px' }}>
-        <TransferFormControl>
-          <TextField
-            sx={{
-              input: { textAlign: 'center' },
-            }}
-            label="From"
-            value={currentWallet!.address}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment sx={{ marginRight: 1 }} position="start">
-                  {currentChain.name}
-                </InputAdornment>
-              ),
-            }}
-            disabled
-          />
-        </TransferFormControl>
-        <TransferFormControl>
-          <InputLabel id="transfer-to-chain-label">Destination Chain</InputLabel>
-          <ChainSelect
-            value={toChain.id}
-            onChange={handleToChainChange}
-            chainList={chainList}
-            labelId="transfer-from-chain-label"
-            id="toChain"
-            label="Destination Chain"
-          />
-        </TransferFormControl>
-        <TransferFormControl>
-          <TextField label="Destination Address" onChange={handleToAddressChange} />
-        </TransferFormControl>
-        <TransferFormControl>
-          <TextField
-            label="Amount"
-            value={amount}
-            onChange={handleAmountChange}
-            name="amount"
-            id="amount"
-            InputProps={{
-              inputComponent: AmountInputComponent as any,
-              endAdornment: (
-                <InputAdornment sx={{ marginLeft: 1 }} position="end">
-                  CRO
-                </InputAdornment>
-              ),
-            }}
-            variant="outlined"
-          />
-          <FormHelperText>
-            Make sure you have reserved small amount as transaction fee or your transaction may
-            fail.
-          </FormHelperText>
-        </TransferFormControl>
-      </Box>
-    </Box>
+    <React.Fragment>
+      <TransferFormControl>
+        <TextField
+          sx={{
+            input: { textAlign: 'center' },
+          }}
+          label="From"
+          value={currentWallet!.address}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment sx={{ marginRight: 1 }} position="start">
+                {currentChain.name}
+              </InputAdornment>
+            ),
+          }}
+          disabled
+        />
+      </TransferFormControl>
+      <TransferFormControl>
+        <InputLabel id="transfer-to-chain-label">Destination Chain</InputLabel>
+        <ChainSelect
+          labelId="transfer-from-chain-label"
+          label="Destination Chain"
+          chainList={chainList}
+          value={toChain.id}
+          onChange={handleToChainChange}
+          disabled={isSending}
+        />
+      </TransferFormControl>
+      <TransferFormControl>
+        <TextField
+          label="Destination Address"
+          value={toAddress}
+          onChange={handleToAddressChange}
+          disabled={isSending}
+        />
+      </TransferFormControl>
+      <TransferFormControl>
+        <InputLabel id="transfer-denom-label">Token</InputLabel>
+        <CurrencySelect
+          labelId="transfer-denom-label"
+          label="Token"
+          currencyList={tokenList}
+          value={token.coinMinimalDenom}
+          onChange={handleTokenChange}
+          disabled={isSending}
+        />
+        <FormHelperText>
+          Max: {balance.humanReadableAmount} {balance.humanReadableDenom}
+        </FormHelperText>
+      </TransferFormControl>
+      <TransferFormControl>
+        <TextField
+          label="Amount"
+          InputProps={{
+            inputComponent: AmountInputComponent as any,
+            endAdornment: (
+              <InputAdornment sx={{ marginLeft: 1 }} position="end">
+                {token.coinDenom}
+              </InputAdornment>
+            ),
+          }}
+          variant="outlined"
+          value={amount}
+          onChange={handleAmountChange}
+          disabled={isSending}
+        />
+        <FormHelperText>
+          Make sure you have reserved small amount of transaction fee or your transaction may fail.
+        </FormHelperText>
+      </TransferFormControl>
+
+      {isIBCTransfer && ibcChannel && (
+        <React.Fragment>
+          <TransferFormControl>
+            <InputLabel id="transfer-ibc-channel-label">IBC Channel</InputLabel>
+            <IBCChannelSelect
+              labelId="transfer-ibc-channel-label"
+              label="IBC Channel"
+              ibcChannelList={ibcChannels}
+              destinationChainIdValue={toChain.id}
+              channelIdValue={ibcChannel!.channelId}
+              onChange={handleIBCChannelChange}
+              disabled={isSending}
+            />
+          </TransferFormControl>
+          <TransferFormControl>
+            <Box sx={{ marginTop: 1, marginRight: 3, marginBottom: 1, marginLeft: 3 }}>
+              <Typography align="left">IBC Timeout</Typography>
+              <Slider
+                min={ibcTimeoutDurationMarkList[0].value}
+                max={ibcTimeoutDurationMarkList[ibcTimeoutDurationMarkList.length - 1].value}
+                aria-label="IBC Timeout"
+                marks={ibcTimeoutDurationMarkList}
+                getAriaValueText={ibcTimeoutDurationValueText}
+                step={null}
+                valueLabelDisplay="off"
+                value={ibcTimeoutMark}
+                onChange={handleIBCTimeoutChange}
+                disabled={isSending}
+              />
+            </Box>
+          </TransferFormControl>
+        </React.Fragment>
+      )}
+      <Button
+        sx={{ marginTop: '8px' }}
+        variant="contained"
+        onClick={sendOnKeplr}
+        disabled={isSending}>
+        {isSending ? 'Reviewing on Keplr...' : 'Send on Keplr'}
+      </Button>
+    </React.Fragment>
   );
 }
 

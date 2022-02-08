@@ -1,11 +1,32 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { RecoilRoot } from 'recoil';
-import { BrowserRouter as Router } from 'react-router-dom';
-import { SnackbarProvider } from 'notistack';
-import './index.css';
 import App from './App';
+import './index.css';
 import reportWebVitals from './reportWebVitals';
+import { SnackbarProvider } from 'notistack';
+import React, { ErrorInfo } from 'react';
+import ReactDOM from 'react-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { RecoilRoot } from 'recoil';
+
+class ErrorBoundary extends React.Component<{}, { hasError: boolean }> {
+  constructor(props: {}) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {}
+
+  render() {
+    if (this.state.hasError) {
+      return <span>Sorry! Something went wrong. Refresh this page and try again.</span>;
+    }
+
+    return this.props.children;
+  }
+}
 
 ReactDOM.render(
   <React.StrictMode>
@@ -14,16 +35,17 @@ ReactDOM.render(
         <SnackbarProvider
           maxSnack={3}
           anchorOrigin={{
-            vertical: "top",
-            horizontal: "right"
-          }}
-        >
-          <App />
+            vertical: 'top',
+            horizontal: 'right',
+          }}>
+          <ErrorBoundary>
+            <App />
+          </ErrorBoundary>
         </SnackbarProvider>
       </Router>
     </RecoilRoot>
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById('root'),
 );
 
 // If you want to start measuring performance in your app, pass a function

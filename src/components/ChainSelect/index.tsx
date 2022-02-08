@@ -1,10 +1,10 @@
-import { ChainConfig, ChainId } from '../../apptypes.d';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectProps } from '@mui/material/Select';
 import { SelectInputProps } from '@mui/material/Select/SelectInput';
 import React from 'react';
+import { Chain } from '../../apptypes.d';
 
-function ChainSelector(props: ChainSelectorProps) {
+function ChainSelect(props: ChainSelectProps) {
   const handleSelectChange: SelectInputProps<ChainId>['onChange'] = (event) => {
     if (!props.onChange) {
       return;
@@ -25,9 +25,11 @@ function ChainSelector(props: ChainSelectorProps) {
   );
 }
 
-export type ChainSelectorProps = Omit<SelectProps<ChainId>, 'onChange'> & {
-  chainList: ChainConfig[];
-  onChange?: (chain: ChainConfig) => void;
+export type ChainSelectProps = Omit<SelectProps<ChainId>, 'onChange'> & {
+  chainList: Chain[];
+  onChange?: (chain: Chain) => void;
 };
 
-export default ChainSelector;
+type ChainId = string;
+
+export default ChainSelect;

@@ -1,26 +1,30 @@
+import './App.css';
+import WalletApp from './containers/WalletApp';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import CssBaseline from '@mui/material/CssBaseline';
 import Typography from '@mui/material/Typography';
-import { styled } from '@mui/system';
 import { useSnackbar } from 'notistack';
 import React, { useEffect } from 'react';
-import './App.css';
-import WalletApp from './containers/WalletApp';
 
-const AppViewport = styled((props: { children: React.ReactNode }) => (
-  <Container maxWidth="md">
+function AppViewport(props: { children: React.ReactNode }) {
+  return (
     <Box
       sx={{
-        height: '100vh',
+        backgroundColor: '#f8f9fe',
       }}>
-      {props.children}
+      <Container maxWidth="md">
+        <Box
+          sx={{
+            height: '100vh',
+          }}>
+          {props.children}
+        </Box>
+      </Container>
     </Box>
-  </Container>
-))({
-  backgroundColor: '#f8f9fe',
-});
+  );
+}
 
 function App() {
   const { enqueueSnackbar } = useSnackbar();
@@ -32,7 +36,7 @@ function App() {
         variant: 'error',
       });
     }
-  }, []);
+  }, [enqueueSnackbar, isKeplrInstalled]);
 
   return (
     <div className="App">

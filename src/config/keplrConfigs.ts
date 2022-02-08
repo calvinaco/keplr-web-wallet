@@ -1,10 +1,14 @@
 import { ChainInfo } from '@keplr-wallet/types';
-import { CronosMainnet25_1KeplrChainConfig } from './chains/cronos-mainnet-25-1';
+import { ChainSource } from '../apptypes.d';
+import chainList from './chains';
 
-const KeplrConfigs: {
+const KeplrConfigs = chainList.reduce<{
   [chainId: string]: ChainInfo;
-} = {
-  [CronosMainnet25_1KeplrChainConfig.chainId]: CronosMainnet25_1KeplrChainConfig,
-};
+}>((keplrConfigs, chain) => {
+  if (chain.chain.source === ChainSource.AppDefault) {
+    keplrConfigs[chain.chain.id] = chain.keplrChainInfo!;
+  }
+  return keplrConfigs;
+}, {});
 
 export default KeplrConfigs;

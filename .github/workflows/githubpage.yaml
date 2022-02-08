@@ -1,0 +1,54 @@
+name: Build and Deploy to GitHub Page
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Install Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+    
+    - name: Install NPM packages
+      run: yarn install --frozen-lockfile
+    
+    - name: Build project
+      run: yarn run build
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: production-files
+        path: ./build
+  
+  deploy:
+    name: Deploy to GitHub Page
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    
+    steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v2
+      with:
+        name: production-files
+        path: ./build
+
+    - name: Deploy to GitHub Page
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./build
