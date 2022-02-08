@@ -55,7 +55,9 @@ function WalletMain(props: WalletMainProps) {
           <Tab label="Transfer" />
           <Tab label="History" />
         </Tabs>
-        {tabPage === 0 && <BalanceList balances={allBalanceOf} onStartTransfer={() => {}} />}
+        {tabPage === 0 && (
+          <BalanceList balances={allBalanceOf} onStartTransfer={() => setTabPage(1)} />
+        )}
         {tabPage === 1 && <Transfer />}
       </Box>
     </Box>

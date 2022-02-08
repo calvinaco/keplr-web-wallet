@@ -14,7 +14,12 @@ function BalanceList(props: BalanceListProps) {
         <ListItem
           key={coin.denom}
           secondaryAction={
-            <IconButton edge="end" aria-label="transfer">
+            <IconButton
+              edge="end"
+              aria-label="transfer"
+              onClick={() => {
+                props.onStartTransfer(coin.denom);
+              }}>
               <SendIcon />
             </IconButton>
           }>
