@@ -165,6 +165,15 @@ function WalletAppStateEffect() {
     }
   }, [currentWallet, updateWalletBalances]);
 
+  const updateWalletBalancesPeriodically = useCallback(() => {
+    updateWalletBalances().finally(() => {
+      setTimeout(updateWalletBalancesPeriodically, 10000);
+    });
+  }, [updateWalletBalances]);
+  useEffect(() => {
+    setTimeout(updateWalletBalancesPeriodically, 15000);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   return null;
 }
 
