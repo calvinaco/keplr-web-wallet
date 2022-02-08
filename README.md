@@ -1,6 +1,6 @@
 # Keplr Web Wallet (Unofficial)
 
-A web wallet that allows sending any tokens from supported chain using Keplr wallet.
+A web wallet that allows sending any tokens from supported chains using Keplr wallet.
 
 ## WARNING
 
@@ -15,9 +15,10 @@ Keplr wallet does not display all the tokens the account has by default. This we
 ## TODO List
 
 - [ ] Transfer form validation
-- [ ] Testing with Ledger
+- [x] Testing with Ledger
 - [ ] Redirect to transfer page from asset list
 - [ ] Better handling of signing and broadcast error
+- [ ] Support more chains
 - [ ] And more...
 
 ## License
