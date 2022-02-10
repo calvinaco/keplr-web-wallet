@@ -263,6 +263,10 @@ function Transfer(props: TransferProps) {
       formErr.token = 'Invalid token';
     }
 
+    if (!new BigNumber(minimalCoinAmount).isInteger()) {
+      formErr.amount = 'Amount has too many decimal places';
+    }
+
     if (
       new BigNumber(amount).isGreaterThan(
         allBalanceOf.find((balance) => balance.denom === token.coinMinimalDenom)!.amount,
