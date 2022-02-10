@@ -14,7 +14,7 @@ Keplr wallet does not display all the tokens the account has by default. This we
 
 ## TODO List
 
-- [ ] Transfer form validation
+- [x] Transfer form validation
 - [x] Testing with Ledger
 - [ ] Redirect to transfer page from asset list
 - [ ] Better handling of signing and broadcast error

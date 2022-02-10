@@ -61,6 +61,14 @@ interface NumberFormatCustomProps {
 
 type TransferProps = {};
 
+type FormError = {
+  toChain?: string;
+  toAddress?: string;
+  token?: string;
+  amount?: string;
+  ibcChannel?: string;
+};
+
 const ibcTimeoutDurationMarkList: {
   value: number;
   duration: DurationLike;
@@ -104,6 +112,7 @@ function Transfer(props: TransferProps) {
   const currentWallet = useRecoilValue(currentWalletAtom) as Wallet;
   const currencyList = useRecoilValue(currencyListOfSelectorFamily(currentChain.id));
   const allBalanceOf = useRecoilValue(allBalanceOfSelector);
+  console.log(allBalanceOf);
   const tokenList: Currency[] = useMemo(
     () =>
       allBalanceOf.map((balance) => {
@@ -122,7 +131,11 @@ function Transfer(props: TransferProps) {
       }),
     [allBalanceOf, currencyList],
   );
+  console.log(tokenList);
   const [token, setToken] = useState<Currency>(tokenList[0]);
+  useEffect(() => {
+    setToken(tokenList[0]);
+  }, [tokenList]);
   const handleTokenChange = useCallback((currency: Currency) => {
     setAmount('0');
     setToken(currency);
@@ -130,6 +143,11 @@ function Transfer(props: TransferProps) {
 
   const balance = useRecoilValue(balanceOfSelectorFamily(token.coinMinimalDenom));
   const [amount, setAmount] = useState<string>('0');
+  useEffect(() => {
+    if (new BigNumber(amount).isGreaterThan(balance.humanReadableAmount)) {
+      setAmount(balance.humanReadableAmount);
+    }
+  }, [balance]); // eslint-disable-line react-hooks/exhaustive-deps
   const handleAmountChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       if (new BigNumber(balance.humanReadableAmount).isLessThan(event.target.value)) {
@@ -153,6 +171,10 @@ function Transfer(props: TransferProps) {
   const handleToChainChange = useCallback((chain: Chain) => {
     setToChain(chain);
   }, []);
+  useEffect(() => {
+    setToAddress('');
+    setToChain(currentChain);
+  }, [currentChain]);
 
   const isIBCTransfer = useMemo(() => currentChain.id !== toChain.id, [currentChain, toChain]);
 
@@ -228,6 +250,53 @@ function Transfer(props: TransferProps) {
     },
     [enqueueSnackbar, currentChain],
   );
+
+  const [formErr, setFormErr] = useState<FormError>({});
+  const validateFormInputs = useCallback((): boolean => {
+    const formErr: FormError = {};
+    if (!chainList.find((chain) => chain.id === toChain.id)) {
+      formErr.toChain = 'Invalid chain';
+    }
+
+    if (toAddress === '') {
+      formErr.toAddress = 'Missing destination address';
+    }
+
+    if (!allBalanceOf.find((balance) => balance.denom === token.coinMinimalDenom)) {
+      formErr.token = 'Invalid token';
+    }
+
+    if (
+      new BigNumber(amount).isGreaterThan(
+        allBalanceOf.find((balance) => balance.denom === token.coinMinimalDenom)!.amount,
+      )
+    ) {
+      formErr.amount = 'Insufficient balance';
+    }
+
+    if (currentChain.id !== toChain.id) {
+      if (!ibcChannel) {
+        enqueueSnackbar('No available IBC channel', {
+          variant: 'error',
+        });
+        formErr.ibcChannel = 'No available IBC channel';
+      }
+    }
+
+    setFormErr(formErr);
+    console.log(Object.keys(formErr));
+    return Object.keys(formErr).length === 0;
+  }, [
+    allBalanceOf,
+    chainList,
+    currentChain,
+    ibcChannel,
+    toAddress,
+    amount,
+    toChain,
+    enqueueSnackbar,
+    token,
+  ]);
   const sendOnKeplr = useCallback(
     () =>
       (async () => {
@@ -298,6 +367,12 @@ function Transfer(props: TransferProps) {
     ],
   );
 
+  const handleSend = useCallback(() => {
+    if (validateFormInputs()) {
+      sendOnKeplr();
+    }
+  }, [sendOnKeplr, validateFormInputs]);
+
   return (
     <React.Fragment>
       <TransferFormControl>
@@ -327,6 +402,7 @@ function Transfer(props: TransferProps) {
           onChange={handleToChainChange}
           disabled={isSending}
         />
+        {formErr.toChain && <FormHelperText error>{formErr.toChain}</FormHelperText>}
       </TransferFormControl>
       <TransferFormControl>
         <TextField
@@ -335,6 +411,7 @@ function Transfer(props: TransferProps) {
           onChange={handleToAddressChange}
           disabled={isSending}
         />
+        {formErr.toAddress && <FormHelperText error>{formErr.toAddress}</FormHelperText>}
       </TransferFormControl>
       <TransferFormControl>
         <InputLabel id="transfer-denom-label">Token</InputLabel>
@@ -346,9 +423,8 @@ function Transfer(props: TransferProps) {
           onChange={handleTokenChange}
           disabled={isSending}
         />
-        <FormHelperText>
-          Max: {balance.humanReadableAmount} {balance.humanReadableDenom}
-        </FormHelperText>
+
+        {formErr.token && <FormHelperText error>{formErr.token}</FormHelperText>}
       </TransferFormControl>
       <TransferFormControl>
         <TextField
@@ -366,6 +442,10 @@ function Transfer(props: TransferProps) {
           onChange={handleAmountChange}
           disabled={isSending}
         />
+        {formErr.amount && <FormHelperText error>{formErr.amount}</FormHelperText>}
+        <FormHelperText>
+          Max: {balance.humanReadableAmount} {balance.humanReadableDenom}
+        </FormHelperText>
         <FormHelperText>
           Make sure you have reserved small amount of transaction fee or your transaction may fail.
         </FormHelperText>
@@ -384,6 +464,7 @@ function Transfer(props: TransferProps) {
               onChange={handleIBCChannelChange}
               disabled={isSending}
             />
+            {formErr.ibcChannel && <FormHelperText error>{formErr.ibcChannel}</FormHelperText>}
           </TransferFormControl>
           <TransferFormControl>
             <Box sx={{ marginTop: 1, marginRight: 3, marginBottom: 1, marginLeft: 3 }}>
@@ -407,7 +488,7 @@ function Transfer(props: TransferProps) {
       <Button
         sx={{ marginTop: '8px' }}
         variant="contained"
-        onClick={sendOnKeplr}
+        onClick={handleSend}
         disabled={isSending}>
         {isSending ? 'Reviewing on Keplr...' : 'Send on Keplr'}
       </Button>

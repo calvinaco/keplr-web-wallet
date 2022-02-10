@@ -23,9 +23,9 @@ const allBalanceOfSelector = selector<Coin[]>({
       .forEach((currency) => {
         if (!balances.find((balance) => balance.denom === currency.coinMinimalDenom)) {
           balances.push({
-            denom: currency.coinDenom,
+            denom: currency.coinMinimalDenom,
             amount: '0',
-            humanReadableDenom: currency.coinMinimalDenom,
+            humanReadableDenom: currency.coinDenom,
             humanReadableAmount: '0',
           });
         }
