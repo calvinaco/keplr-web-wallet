@@ -112,7 +112,6 @@ function Transfer(props: TransferProps) {
   const currentWallet = useRecoilValue(currentWalletAtom) as Wallet;
   const currencyList = useRecoilValue(currencyListOfSelectorFamily(currentChain.id));
   const allBalanceOf = useRecoilValue(allBalanceOfSelector);
-  console.log(allBalanceOf);
   const tokenList: Currency[] = useMemo(
     () =>
       allBalanceOf.map((balance) => {
@@ -131,7 +130,6 @@ function Transfer(props: TransferProps) {
       }),
     [allBalanceOf, currencyList],
   );
-  console.log(tokenList);
   const [token, setToken] = useState<Currency>(tokenList[0]);
   useEffect(() => {
     setToken(tokenList[0]);
@@ -191,7 +189,6 @@ function Transfer(props: TransferProps) {
     setIBCChannel(ibcChannels.length > 0 ? ibcChannels[0] : null);
   }, [ibcChannels]);
   const handleIBCChannelChange = useCallback((channel: IBCSourceChainChannel) => {
-    console.log(channel);
     setIBCChannel(channel);
   }, []);
   const [ibcTimeoutMark, setIBCTimeoutMark] = useState<number>(1);
@@ -284,7 +281,6 @@ function Transfer(props: TransferProps) {
     }
 
     setFormErr(formErr);
-    console.log(Object.keys(formErr));
     return Object.keys(formErr).length === 0;
   }, [
     allBalanceOf,
