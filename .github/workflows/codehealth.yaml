@@ -1,0 +1,49 @@
+name: Code Healthiness Check
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Install Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+    
+    - name: Install NPM packages
+      run: yarn install --frozen-lockfile
+    
+    - name: Build project
+      run: yarn run build
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Install Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.x
+    
+    - name: Install NPM packages
+      run: yarn install --frozen-lockfile
+    
+    - name: Run lint
+      run: yarn run lint
+  
