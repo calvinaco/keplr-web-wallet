@@ -27,6 +27,11 @@ const CryptoOrgChainMainnet_1: ChainConfig = {
         coinDenom: 'DOT',
         coinDecimals: 10,
       },
+      {
+        coinMinimalDenom: 'ibc/401E8BFB2B898C62A272A77F721A04A2345E3A4D93F69E467B7C98A9CF998FEE',
+        coinDenom: 'ADA',
+        coinDecimals: 6,
+      },
     ],
   },
   ibcChannelList: [
