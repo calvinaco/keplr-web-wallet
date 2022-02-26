@@ -1,6 +1,9 @@
-name: Build and Deploy to GitHub Page
+name: Code Healthiness Check
 
 on:
+  push:
+    branches:
+      - master
   pull_request:
     branches:
       - master
