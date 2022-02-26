@@ -288,14 +288,15 @@ function Transfer(props: TransferProps) {
     return Object.keys(formErr).length === 0;
   }, [
     allBalanceOf,
+    amount,
     chainList,
     currentChain,
-    ibcChannel,
-    toAddress,
-    amount,
-    toChain,
     enqueueSnackbar,
+    ibcChannel,
+    minimalCoinAmount,
     token,
+    toAddress,
+    toChain,
   ]);
   const sendOnKeplr = useCallback(
     () =>
