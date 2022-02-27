@@ -1,3 +1,3 @@
-import pendingTranferMinimalDenomAtom from './atom';
+import pendingTransferMinimalDenomAtom from './atom';
 
-export default pendingTranferMinimalDenomAtom;
+export default pendingTransferMinimalDenomAtom;

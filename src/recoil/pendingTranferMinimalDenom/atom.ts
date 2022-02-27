@@ -2,9 +2,9 @@ import { atom } from 'recoil';
 
 type MinimalDenom = string;
 
-const pendingTranferMinimalDenomAtom = atom<MinimalDenom | null>({
-  key: 'pendingTranferMinimalDenom',
+const pendingTransferMinimalDenomAtom = atom<MinimalDenom>({
+  key: 'pendingTransferMinimalDenom',
   default: '',
 });
 
-export default pendingTranferMinimalDenomAtom;
+export default pendingTransferMinimalDenomAtom;

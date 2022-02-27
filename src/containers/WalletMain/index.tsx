@@ -3,7 +3,7 @@ import WalletAddressLabel from '../../components/WalletAddressLabel';
 import { allBalanceOfSelector } from '../../recoil/balanceOf';
 import currentChainAtom from '../../recoil/currentChain';
 import currentWalletAtom from '../../recoil/currentWallet';
-import pendingTranferMinimalDenomAtom from '../../recoil/pendingTranferMinimalDenom';
+import pendingTransferMinimalDenomAtom from '../../recoil/pendingTransferMinimalDenom';
 import ConnectKeplrButton from '../ConnectKeplrButton';
 import Transfer from '../Transfer';
 import Box from '@mui/material/Box';
@@ -30,7 +30,7 @@ function WalletMain(props: WalletMainProps) {
   const currentWallet = useRecoilValue(currentWalletAtom);
   const currentChain = useRecoilValue(currentChainAtom);
   const allBalanceOf = useRecoilValue(allBalanceOfSelector);
-  const setPendingTransferMinimalDenom = useSetRecoilState(pendingTranferMinimalDenomAtom);
+  const setPendingTransferMinimalDenom = useSetRecoilState(pendingTransferMinimalDenomAtom);
   const [tabPage, setTabPage] = useState<number>(0);
 
   if (currentWallet === null) {

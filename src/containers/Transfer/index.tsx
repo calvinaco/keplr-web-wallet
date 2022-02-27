@@ -9,7 +9,7 @@ import currencyListOfSelectorFamily from '../../recoil/currencyListOf';
 import currentChainAtom from '../../recoil/currentChain';
 import currentWalletAtom from '../../recoil/currentWallet';
 import ibcChannelListOfSelectorFamily from '../../recoil/ibcChannelListOf';
-import pendingTransferMinimalDenomAtom from '../../recoil/pendingTranferMinimalDenom';
+import pendingTransferMinimalDenomAtom from '../../recoil/pendingTransferMinimalDenom';
 import { DeliverTxResponse, SigningStargateClient } from '@cosmjs/stargate';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
