@@ -1,7 +1,8 @@
 import App from './App';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
-import { SnackbarProvider } from 'notistack';
+import Button from '@mui/material/Button';
+import { SnackbarKey, SnackbarProvider } from 'notistack';
 import React, { ErrorInfo } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
@@ -28,20 +29,39 @@ class ErrorBoundary extends React.Component<{}, { hasError: boolean }> {
   }
 }
 
+function AppSnackbarProvider(props: { children: React.ReactNode }) {
+  const notistackRef = React.createRef<SnackbarProvider>();
+  const onClickDismiss = (key: SnackbarKey) => () => {
+    notistackRef.current!.closeSnackbar(key);
+  };
+
+  return (
+    <SnackbarProvider
+      maxSnack={3}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+      ref={notistackRef}
+      action={(key) => (
+        <Button sx={{ color: '#fff' }} onClick={onClickDismiss(key)}>
+          Dismiss
+        </Button>
+      )}>
+      {props.children}
+    </SnackbarProvider>
+  );
+}
+
 ReactDOM.render(
   <React.StrictMode>
     <RecoilRoot>
       <Router basename={process.env.PUBLIC_URL}>
-        <SnackbarProvider
-          maxSnack={3}
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
-          }}>
+        <AppSnackbarProvider>
           <ErrorBoundary>
             <App />
           </ErrorBoundary>
-        </SnackbarProvider>
+        </AppSnackbarProvider>
       </Router>
     </RecoilRoot>
   </React.StrictMode>,

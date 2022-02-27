@@ -16,7 +16,6 @@ const allBalanceOfSelector = selector<Coin[]>({
         ...balance,
       }));
 
-    // TODO: Move logic to SelectorFamily
     const currencyList = get(currencyListOfSelector(get(currentChainAtom).id));
     currencyList
       .filter((currency) => currency.alwaysDisplay)

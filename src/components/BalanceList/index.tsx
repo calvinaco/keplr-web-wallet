@@ -1,4 +1,4 @@
-import { Coin, Denom } from '../../apptypes.d';
+import { Coin } from '../../apptypes.d';
 import BlockieAvatar from '../BlockieAvatar';
 import SendIcon from '@mui/icons-material/Send';
 import IconButton from '@mui/material/IconButton';
@@ -6,6 +6,8 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemText from '@mui/material/ListItemText';
+
+type MinimalDenom = string;
 
 function BalanceList(props: BalanceListProps) {
   return (
@@ -38,7 +40,7 @@ function BalanceList(props: BalanceListProps) {
 
 export type BalanceListProps = {
   balances: Coin[];
-  onStartTransfer: (denom: Denom) => void;
+  onStartTransfer: (minimalDenom: MinimalDenom) => void;
 };
 
 export default BalanceList;
