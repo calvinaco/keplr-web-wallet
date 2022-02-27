@@ -269,7 +269,7 @@ function Transfer(props: TransferProps) {
   }, [tokenList, currentChain, ibcChannels]);
 
   useEffect(() => {
-    if (pendingTransferMinimalDenom) {
+    if (pendingTransferMinimalDenom !== '') {
       const token = tokenList.find(
         (token) => token.coinMinimalDenom === pendingTransferMinimalDenom,
       );
