@@ -1,18 +1,20 @@
-import { Coin, Denom } from '../../apptypes.d';
+import { Coin } from '../../apptypes.d';
 import currencyListOfSelectorFamily from '../currencyListOf';
 import currentChainAtom from '../currentChain';
 import { _balanceDenomListAtom, _balancesAtomFamily } from './atom';
 import BigNumber from 'bignumber.js';
 import { DefaultValue, selectorFamily } from 'recoil';
 
-const balanceOfSelectorFamily = selectorFamily<Coin, Denom>({
+type MinimalDenom = string;
+
+const balanceOfSelectorFamily = selectorFamily<Coin, MinimalDenom>({
   key: 'balanceOf',
   get:
-    (denom: Denom) =>
+    (minimalDenom: MinimalDenom) =>
     ({ get }) => {
-      const balance = get(_balancesAtomFamily(denom));
+      const balance = get(_balancesAtomFamily(minimalDenom));
       const currency = get(currencyListOfSelectorFamily(get(currentChainAtom).id)).find(
-        (currency) => currency.coinMinimalDenom === denom,
+        (currency) => currency.coinMinimalDenom === minimalDenom,
       );
       if (!currency) {
         return balance;
@@ -27,16 +29,16 @@ const balanceOfSelectorFamily = selectorFamily<Coin, Denom>({
       };
     },
   set:
-    (denom: Denom) =>
+    (minimalDenom: MinimalDenom) =>
     ({ get, set, reset }, balance) => {
       if (balance instanceof DefaultValue) {
-        reset(_balancesAtomFamily(denom));
-        set(_balanceDenomListAtom, (prevState) => prevState.filter((d) => d !== denom));
+        reset(_balancesAtomFamily(minimalDenom));
+        set(_balanceDenomListAtom, (prevState) => prevState.filter((d) => d !== minimalDenom));
         return;
       }
-      set(_balancesAtomFamily(denom), balance);
-      if (!get(_balanceDenomListAtom).includes(denom)) {
-        set(_balanceDenomListAtom, (prevState) => [...prevState, denom]);
+      set(_balancesAtomFamily(minimalDenom), balance);
+      if (!get(_balanceDenomListAtom).includes(minimalDenom)) {
+        set(_balanceDenomListAtom, (prevState) => [...prevState, minimalDenom]);
       }
     },
 });

@@ -1,5 +1,3 @@
-export type Denom = string;
-
 export type Coin = {
   denom: string;
   amount: string;

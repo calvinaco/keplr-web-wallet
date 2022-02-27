@@ -2,12 +2,14 @@ import { Chain, Currency, IBCSourceChainChannel, Wallet, WalletType } from '../.
 import ChainSelect from '../../components/ChainSelect';
 import CurrencySelect from '../../components/CurrencySelect';
 import IBCChannelSelect from '../../components/IBCChannelSelect';
+import { errorMessageGuard } from '../../error';
 import balanceOfSelectorFamily, { allBalanceOfSelector } from '../../recoil/balanceOf';
 import chainListSelector from '../../recoil/chainList/selector';
 import currencyListOfSelectorFamily from '../../recoil/currencyListOf';
 import currentChainAtom from '../../recoil/currentChain';
 import currentWalletAtom from '../../recoil/currentWallet';
 import ibcChannelListOfSelectorFamily from '../../recoil/ibcChannelListOf';
+import pendingTransferMinimalDenomAtom from '../../recoil/pendingTransferMinimalDenom';
 import { DeliverTxResponse, SigningStargateClient } from '@cosmjs/stargate';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -24,7 +26,7 @@ import { DateTime, DurationLike } from 'luxon';
 import { useSnackbar } from 'notistack';
 import React, { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import NumberFormat from 'react-number-format';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
 function TransferFormControl(props: Omit<FormControlProps, 'margin' | 'fullWidth'>) {
   return <FormControl sx={{ margin: 1 }} fullWidth {...props} />;
@@ -112,6 +114,9 @@ function Transfer(props: TransferProps) {
   const currentWallet = useRecoilValue(currentWalletAtom) as Wallet;
   const currencyList = useRecoilValue(currencyListOfSelectorFamily(currentChain.id));
   const allBalanceOf = useRecoilValue(allBalanceOfSelector);
+  const [pendingTransferMinimalDenom, setPendingTransferMinimalDenom] = useRecoilState(
+    pendingTransferMinimalDenomAtom,
+  );
   const tokenList: Currency[] = useMemo(
     () =>
       allBalanceOf.map((balance) => {
@@ -134,10 +139,14 @@ function Transfer(props: TransferProps) {
   useEffect(() => {
     setToken(tokenList[0]);
   }, [tokenList]);
-  const handleTokenChange = useCallback((currency: Currency) => {
-    setAmount('0');
-    setToken(currency);
-  }, []);
+  const handleTokenChange = useCallback(
+    (currency: Currency) => {
+      setPendingTransferMinimalDenom('');
+      setAmount('0');
+      setToken(currency);
+    },
+    [setPendingTransferMinimalDenom],
+  );
 
   const balance = useRecoilValue(balanceOfSelectorFamily(token.coinMinimalDenom));
   const [amount, setAmount] = useState<string>('0');
@@ -222,6 +231,7 @@ function Transfer(props: TransferProps) {
           </Typography>,
           {
             variant: 'success',
+            persist: true,
           },
         );
       } else {
@@ -241,12 +251,39 @@ function Transfer(props: TransferProps) {
           </Typography>,
           {
             variant: 'error',
+            persist: true,
           },
         );
       }
     },
     [enqueueSnackbar, currentChain],
   );
+
+  const resetForm = useCallback(() => {
+    setToken(tokenList[0]);
+    setAmount('0');
+    setToAddress('');
+    setToChain(currentChain);
+    setIBCChannel(ibcChannels.length > 0 ? ibcChannels[0] : null);
+    setIBCTimeoutMark(1);
+  }, [tokenList, currentChain, ibcChannels]);
+
+  useEffect(() => {
+    if (pendingTransferMinimalDenom !== '') {
+      const token = tokenList.find(
+        (token) => token.coinMinimalDenom === pendingTransferMinimalDenom,
+      );
+      if (!token) {
+        throw new Error('Token not found');
+      }
+      resetForm();
+      setToken(token);
+
+      return () => {
+        setPendingTransferMinimalDenom('');
+      };
+    }
+  }, [pendingTransferMinimalDenom, resetForm, setPendingTransferMinimalDenom, token, tokenList]);
 
   const [formErr, setFormErr] = useState<FormError>({});
   const validateFormInputs = useCallback((): boolean => {
@@ -300,7 +337,7 @@ function Transfer(props: TransferProps) {
   ]);
   const sendOnKeplr = useCallback(
     () =>
-      (async () => {
+      (async (): Promise<DeliverTxResponse> => {
         setIsSending(true);
         const offlineSigner =
           currentWallet.type === WalletType.Ledger
@@ -311,7 +348,6 @@ function Transfer(props: TransferProps) {
           offlineSigner,
         );
 
-        // TODO: form validation
         if (isIBCTransfer) {
           const result = await cosmJS.sendIbcTokens(
             currentWallet.address,
@@ -333,7 +369,8 @@ function Transfer(props: TransferProps) {
             },
             '',
           );
-          notifyDeliveryTxResult(result);
+
+          return result;
         } else {
           const result = await cosmJS.sendTokens(
             currentWallet.address,
@@ -350,7 +387,7 @@ function Transfer(props: TransferProps) {
             },
             '',
           );
-          notifyDeliveryTxResult(result);
+          return result;
         }
       })().finally(() => {
         setIsSending(false);
@@ -364,15 +401,29 @@ function Transfer(props: TransferProps) {
       isIBCTransfer,
       ibcChannel,
       ibcTimeout,
-      notifyDeliveryTxResult,
     ],
   );
 
-  const handleSend = useCallback(() => {
-    if (validateFormInputs()) {
-      sendOnKeplr();
-    }
-  }, [sendOnKeplr, validateFormInputs]);
+  const handleSend = useCallback(
+    () =>
+      (async () => {
+        if (!validateFormInputs()) {
+          return;
+        }
+        try {
+          const result = await sendOnKeplr();
+          notifyDeliveryTxResult(result);
+          resetForm();
+        } catch (err) {
+          const message = errorMessageGuard(err);
+          enqueueSnackbar(message, {
+            variant: 'error',
+            persist: true,
+          });
+        }
+      })(),
+    [enqueueSnackbar, notifyDeliveryTxResult, sendOnKeplr, validateFormInputs, resetForm],
+  );
 
   return (
     <React.Fragment>
