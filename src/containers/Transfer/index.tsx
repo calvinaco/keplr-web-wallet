@@ -407,18 +407,19 @@ function Transfer(props: TransferProps) {
   const handleSend = useCallback(
     () =>
       (async () => {
-        if (validateFormInputs()) {
-          try {
-            const result = await sendOnKeplr();
-            notifyDeliveryTxResult(result);
-            resetForm();
-          } catch (err) {
-            const message = errorMessageGuard(err);
-            enqueueSnackbar(message, {
-              variant: 'error',
-              persist: true,
-            });
-          }
+        if (!validateFormInputs()) {
+          return;
+        }
+        try {
+          const result = await sendOnKeplr();
+          notifyDeliveryTxResult(result);
+          resetForm();
+        } catch (err) {
+          const message = errorMessageGuard(err);
+          enqueueSnackbar(message, {
+            variant: 'error',
+            persist: true,
+          });
         }
       })(),
     [enqueueSnackbar, notifyDeliveryTxResult, sendOnKeplr, validateFormInputs, resetForm],
