@@ -7,6 +7,7 @@ const CronosMainnet25_1: ChainConfig = {
     name: 'Cronos',
     network: ChainNetwork.Mainnet,
     source: ChainSource.AppDefault,
+    addressBech32Prefix: 'crc',
     rpcBaseURLs: {
       tendermint: 'https://rpc-cronos.crypto.org',
       lcd: 'https://rest-cronos.crypto.org',

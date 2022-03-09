@@ -7,6 +7,7 @@ const CryptoOrgChainMainnet_1: ChainConfig = {
     name: 'Crypto.org Chain',
     network: ChainNetwork.Mainnet,
     source: ChainSource.KeplrDefault,
+    addressBech32Prefix: 'cro',
     rpcBaseURLs: {
       tendermint: 'https://mainnet.crypto.org:26657',
       lcd: 'https://mainnet.crypto.org:1317',
