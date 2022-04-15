@@ -9,7 +9,6 @@ import { useSnackbar } from 'notistack';
 import React, { useEffect, useState } from 'react';
 
 const oneSecond = 1000;
-const fiveSeconds = 5000;
 
 function AppViewport(props: { children: React.ReactNode }) {
   return (
