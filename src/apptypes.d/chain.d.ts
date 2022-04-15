@@ -5,6 +5,7 @@ export type Chain = {
   name: string;
   network?: ChainNetwork;
   source: ChainSource;
+  addressBech32Prefix: string;
   rpcBaseURLs: {
     tendermint: string;
     lcd: string;
