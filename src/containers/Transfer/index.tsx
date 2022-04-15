@@ -20,6 +20,7 @@ import InputLabel from '@mui/material/InputLabel';
 import Slider from '@mui/material/Slider';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { bech32 } from 'bech32';
 import BigNumber from 'bignumber.js';
 import Long from 'long';
 import { DateTime, DurationLike } from 'luxon';
@@ -288,12 +289,28 @@ function Transfer(props: TransferProps) {
   const [formErr, setFormErr] = useState<FormError>({});
   const validateFormInputs = useCallback((): boolean => {
     const formErr: FormError = {};
-    if (!chainList.find((chain) => chain.id === toChain.id)) {
+    const destinationChain = chainList.find((chain) => chain.id === toChain.id);
+    if (!destinationChain) {
       formErr.toChain = 'Invalid chain';
     }
 
     if (toAddress === '') {
       formErr.toAddress = 'Missing destination address';
+    }
+
+    try {
+      const bech32DecodedAddress = bech32.decode(toAddress);
+      if (bech32DecodedAddress.prefix !== destinationChain!.addressBech32Prefix) {
+        formErr.toAddress = `Invalid address: Chain mismatch, expected "${
+          destinationChain!.addressBech32Prefix
+        }" prefix.`;
+      }
+    } catch (err) {
+      const message = errorMessageGuard(err);
+      formErr.toAddress = `Invalid address: Not a bech32 address or ${message.replace(
+        toAddress,
+        '',
+      )}`;
     }
 
     if (!allBalanceOf.find((balance) => balance.denom === token.coinMinimalDenom)) {
