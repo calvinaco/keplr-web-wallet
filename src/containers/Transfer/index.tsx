@@ -362,7 +362,7 @@ function Transfer(props: TransferProps) {
               revisionNumber: Long.fromNumber(0),
               revisionHeight: Long.fromNumber(0),
             },
-            DateTime.now().setZone('utc').plus(ibcTimeout).toMillis() * 1000000,
+            DateTime.now().setZone('utc').plus(ibcTimeout).toSeconds(),
             {
               amount: [],
               gas: '200000',
