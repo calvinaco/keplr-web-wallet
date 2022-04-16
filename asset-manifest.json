@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/keplr-web-wallet/static/css/main.1ef3a49a.css",
-    "main.js": "/keplr-web-wallet/static/js/main.59f45f03.js",
+    "main.js": "/keplr-web-wallet/static/js/main.c6943f1e.js",
     "static/js/787.2e174f85.chunk.js": "/keplr-web-wallet/static/js/787.2e174f85.chunk.js",
     "index.html": "/keplr-web-wallet/index.html",
     "main.1ef3a49a.css.map": "/keplr-web-wallet/static/css/main.1ef3a49a.css.map",
-    "main.59f45f03.js.map": "/keplr-web-wallet/static/js/main.59f45f03.js.map",
+    "main.c6943f1e.js.map": "/keplr-web-wallet/static/js/main.c6943f1e.js.map",
     "787.2e174f85.chunk.js.map": "/keplr-web-wallet/static/js/787.2e174f85.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.1ef3a49a.css",
-    "static/js/main.59f45f03.js"
+    "static/js/main.c6943f1e.js"
   ]
 }
