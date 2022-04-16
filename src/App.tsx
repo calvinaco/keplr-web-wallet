@@ -57,7 +57,6 @@ function App() {
     setNextTimeout();
   }, [enqueueSnackbar, isKeplrInstalled]);
 
-  console.log(isKeplrInstalled);
   return (
     <div className="App">
       <CssBaseline />
