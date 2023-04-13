@@ -10,7 +10,7 @@ const CryptoOrgChainMainnet_1: ChainConfig = {
     addressBech32Prefix: 'cro',
     rpcBaseURLs: {
       tendermint: 'https://rpc.mainnet.crypto.org',
-      lcd: 'https://rest.mainnet.crypto.org/',
+      lcd: 'https://rest.mainnet.crypto.org',
     },
     explorerURLs: {
       account: 'https://crypto.org/explorer/account/{account}',
