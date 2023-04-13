@@ -9,8 +9,8 @@ const CryptoOrgChainMainnet_1: ChainConfig = {
     source: ChainSource.KeplrDefault,
     addressBech32Prefix: 'cro',
     rpcBaseURLs: {
-      tendermint: 'https://mainnet.crypto.org:26657',
-      lcd: 'https://mainnet.crypto.org:1317',
+      tendermint: 'https://rpc.mainnet.crypto.org',
+      lcd: 'https://rest.mainnet.crypto.org',
     },
     explorerURLs: {
       account: 'https://crypto.org/explorer/account/{account}',

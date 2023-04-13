@@ -9,12 +9,12 @@ const CronosMainnet25_1: ChainConfig = {
     source: ChainSource.AppDefault,
     addressBech32Prefix: 'crc',
     rpcBaseURLs: {
-      tendermint: 'https://rpc-cronos.crypto.org',
-      lcd: 'https://rest-cronos.crypto.org',
+      tendermint: 'https://rpc.cronos.org',
+      lcd: 'https://rest.cronos.org',
     },
     explorerURLs: {
       account: 'https://cronoscan.com/address/{account}',
-      transaction: 'https://rest-cronos.crypto.org/cosmos/tx/v1beta1/txs/{transaction}',
+      transaction: 'https://rest.cronos.org/cosmos/tx/v1beta1/txs/{transaction}',
     },
     currencyList: [
       {
@@ -38,9 +38,9 @@ const CronosMainnet25_1: ChainConfig = {
     // The name of the chain to be displayed to the user.
     chainName: 'Cronos',
     // RPC endpoint of the chain.
-    rpc: 'https://rpc-cronos.crypto.org',
+    rpc: 'https://rpc.cronos.org',
     // REST endpoint of the chain.
-    rest: 'https://rest-cronos.crypto.org',
+    rest: 'https://rest.cronos.org',
     // Staking coin information
     stakeCurrency: {
       // Coin denomination to be displayed to the user.
