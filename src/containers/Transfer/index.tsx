@@ -22,7 +22,6 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { bech32 } from 'bech32';
 import BigNumber from 'bignumber.js';
-import Long from 'long';
 import { DateTime, DurationLike } from 'luxon';
 import { useSnackbar } from 'notistack';
 import React, { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react';
@@ -376,10 +375,10 @@ function Transfer(props: TransferProps) {
             'transfer',
             ibcChannel!.channelId,
             {
-              revisionNumber: Long.fromNumber(0),
-              revisionHeight: Long.fromNumber(0),
+              revisionNumber: BigInt(0),
+              revisionHeight: BigInt(0),
             },
-            DateTime.now().setZone('utc').plus(ibcTimeout).toSeconds(),
+            Math.floor(DateTime.now().setZone('utc').plus(ibcTimeout).toSeconds()),
             {
               amount: [],
               gas: '200000',

@@ -9,7 +9,7 @@
   "homepage": "http://calvinaco.github.io/keplr-web-wallet",
   "dependencies": {
     "@babel/core": "7.16.0",
-    "@cosmjs/stargate": "0.27.1",
+    "@cosmjs/stargate": "0.36.0",
     "@emotion/react": "11.7.1",
     "@emotion/styled": "11.6.0",
     "@mui/icons-material": "5.3.1",
