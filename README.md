@@ -21,6 +21,22 @@ Keplr wallet does not display all the tokens the account has by default. This we
 - [ ] Support more chains
 - [ ] And more...
 
+## Development
+
+### Local Development
+```bash
+npm install
+npm run start
+```
+
+### Test Local Build
+
+1. Change homepage in package.json to "."
+2. Run the following command
+```bash
+npm run build
+```
+
 ## License
 
 [MIT License](./LICENSE)
